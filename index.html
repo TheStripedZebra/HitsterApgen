@@ -8,26 +8,35 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
+
+    :root {
+      --navy-deep: #071538;
+      --navy-main: #0B2257;
+      --navy-card: #0E2966;
+      --ice-blue: #B7D1EC;
+      --ice-bright: #D6E6F5;
+      --ice-muted: #7FA4CC;
+    }
 
     body {
       font-family: 'Outfit', sans-serif;
-      background-color: #09090b;
-      color: #fafafa;
+      background-color: var(--navy-deep);
+      color: var(--ice-bright);
       overscroll-behavior-y: contain;
       -webkit-tap-highlight-color: transparent;
     }
 
-    @keyframes spinVinyl {
+    @keyframes spinEmblem {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    .vinyl-spin {
-      animation: spinVinyl 6s linear infinite;
+    .emblem-spin {
+      animation: spinEmblem 8s linear infinite;
     }
 
-    .vinyl-paused {
+    .emblem-paused {
       animation-play-state: paused;
     }
 
@@ -37,7 +46,7 @@
     }
 
     .eq-bar {
-      animation: eqBar 0.7s ease-in-out infinite;
+      animation: eqBar 0.75s ease-in-out infinite;
     }
 
     .eq-paused {
@@ -45,7 +54,6 @@
       height: 6px !important;
     }
 
-    /* Clean up html5-qrcode default UI */
     #reader {
       border: none !important;
       border-radius: 1rem;
@@ -56,7 +64,7 @@
       border-radius: 1rem;
     }
     #reader__scan_region {
-      background: #000;
+      background: #050f29;
     }
     #reader__dashboard_section_csr span,
     #reader__dashboard_section_swaplink,
@@ -64,38 +72,52 @@
       display: none !important;
     }
     #reader button {
-      background: linear-gradient(135deg, #ec4899, #8b5cf6) !important;
-      color: white !important;
+      background-color: #B7D1EC !important;
+      color: #071538 !important;
       border: none !important;
-      padding: 10px 20px !important;
+      padding: 10px 22px !important;
       border-radius: 9999px !important;
-      font-weight: 700 !important;
+      font-weight: 800 !important;
       font-size: 14px !important;
       margin: 10px auto !important;
       cursor: pointer !important;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between max-w-md mx-auto bg-zinc-950 relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col justify-between max-w-md mx-auto bg-[#071538] relative overflow-x-hidden text-[#D6E6F5]">
+
+  <!-- SVG Embleem Definitie (Wereldbol & Fakkel) -->
+  <svg class="hidden" aria-hidden="true">
+    <defs>
+      <g id="torch-globe-icon" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="#B7D1EC" stroke="#0B2257" stroke-width="5"/>
+        <path d="M22 34 C34 26, 48 30, 44 44 C40 54, 24 58, 18 48 Z" fill="#0B2257"/>
+        <path d="M58 24 C70 22, 82 32, 78 46 C74 58, 62 54, 58 42 Z" fill="#0B2257"/>
+        <path d="M34 64 C46 58, 62 64, 58 78 C54 88, 36 86, 32 74 Z" fill="#0B2257"/>
+        <path d="M14 66 C24 62, 34 66, 42 70 L38 75 C28 71, 20 71, 14 73 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M46 46 L56 42 L68 78 L58 82 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M44 44 C38 34, 46 20, 58 14 C56 22, 62 24, 66 16 C70 24, 66 36, 58 43 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M62 62 C72 58, 82 62, 88 68 L84 73 C78 68, 70 66, 62 68 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
+      </g>
+    </defs>
+  </svg>
 
   <!-- Header -->
-  <header class="pt-5 pb-3 px-5 flex items-center justify-between border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-30">
-    <div class="flex items-center gap-2.5">
-      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-pink-500/20">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-        </svg>
-      </div>
+  <header class="pt-5 pb-3 px-5 flex items-center justify-between border-b border-[#B7D1EC]/20 bg-[#071538]/95 backdrop-blur-md sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <svg class="w-10 h-10 shrink-0 drop-shadow" viewBox="0 0 100 100">
+        <use href="#torch-globe-icon"></use>
+      </svg>
       <div>
-        <h1 class="font-black text-lg tracking-tight bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+        <h1 class="font-black text-lg tracking-tight text-[#D6E6F5]">
           HITSTER SCANNER
         </h1>
-        <p class="text-[11px] text-zinc-400 -mt-1">GitHub & Blind Audio Edition</p>
+        <p class="text-[11px] text-[#8FB4D9] -mt-0.5 font-medium">GitHub & Blind Audio Edition</p>
       </div>
     </div>
 
-    <span id="privacyBadge" class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="privacyBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#B7D1EC]/15 text-[#B7D1EC] border border-[#B7D1EC]/30 flex items-center gap-1.5">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#B7D1EC] animate-pulse"></span>
       Spoiler-vrij
     </span>
   </header>
@@ -106,31 +128,31 @@
     <!-- TAB 1: SCANNER -->
     <section id="tab-scanner" class="space-y-5">
       <div class="text-center space-y-1">
-        <h2 class="text-xl font-bold text-white">Scan een muziekkaart</h2>
-        <p class="text-sm text-zinc-400">Richt je camera op de QR-code. De titel blijft geheim.</p>
+        <h2 class="text-xl font-extrabold text-[#D6E6F5]">Scan een muziekkaart</h2>
+        <p class="text-sm text-[#8FB4D9]">Richt je camera op de QR-code. De titel blijft geheim.</p>
       </div>
 
       <!-- Camera Viewport -->
-      <div class="relative rounded-2xl bg-zinc-900 border border-zinc-800 p-2 shadow-2xl">
-        <div id="reader" class="w-full min-h-[280px] bg-black flex items-center justify-center rounded-xl overflow-hidden"></div>
+      <div class="relative rounded-2xl bg-[#0B2257] border-2 border-[#B7D1EC]/30 p-2 shadow-xl">
+        <div id="reader" class="w-full min-h-[280px] bg-[#050f29] flex items-center justify-center rounded-xl overflow-hidden"></div>
       </div>
 
       <!-- Scanner Controls -->
       <div class="flex gap-3">
-        <button id="btnStartScan" onclick="startScanner()" class="flex-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg shadow-pink-500/25 active:scale-95 transition">
+        <button id="btnStartScan" onclick="startScanner()" class="flex-1 py-3.5 px-4 rounded-xl font-extrabold text-sm bg-[#B7D1EC] hover:bg-[#D6E6F5] text-[#071538] shadow-md active:scale-95 transition">
           Camera Starten
         </button>
-        <button id="btnStopScan" onclick="stopScanner()" class="hidden flex-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-zinc-800 text-zinc-200 border border-zinc-700 active:scale-95 transition">
+        <button id="btnStopScan" onclick="stopScanner()" class="hidden flex-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-[#0B2257] text-[#D6E6F5] border border-[#B7D1EC]/30 active:scale-95 transition">
           Camera Stoppen
         </button>
       </div>
 
-      <!-- Manual Test Input (Handig om GitHub link direct te testen) -->
-      <div class="pt-4 border-t border-zinc-800/80">
-        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Handmatige test (zonder camera)</p>
+      <!-- Manual Test Input -->
+      <div class="pt-4 border-t border-[#B7D1EC]/15">
+        <p class="text-xs font-bold uppercase tracking-wider text-[#8FB4D9] mb-2">Handmatige test (zonder camera)</p>
         <div class="flex gap-2">
-          <input id="manualUrlInput" type="url" placeholder="Plak hier een GitHub MP3 link..." class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500" />
-          <button onclick="handleManualInput()" class="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-bold text-cyan-400 border border-zinc-700 active:scale-95 transition">
+          <input id="manualUrlInput" type="url" placeholder="Plak hier een GitHub MP3 link..." class="flex-1 bg-[#0B2257] border border-[#B7D1EC]/25 rounded-xl px-3.5 py-2.5 text-sm text-[#D6E6F5] placeholder-[#6E93BA] focus:outline-none focus:border-[#B7D1EC]" />
+          <button onclick="handleManualInput()" class="px-4 py-2.5 rounded-xl bg-[#B7D1EC]/15 hover:bg-[#B7D1EC]/25 text-sm font-bold text-[#B7D1EC] border border-[#B7D1EC]/30 active:scale-95 transition">
             Speel
           </button>
         </div>
@@ -141,88 +163,81 @@
     <section id="tab-player" class="hidden space-y-6">
       <!-- Status Banner -->
       <div class="text-center">
-        <span id="playerStatusText" class="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+        <span id="playerStatusText" class="inline-block text-xs font-bold uppercase tracking-widest px-3.5 py-1 rounded-full bg-[#0B2257] text-[#B7D1EC] border border-[#B7D1EC]/30">
           Klaar om te luisteren
         </span>
       </div>
 
-      <!-- Mystery Card / Vinyl View -->
-      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px] transition-all duration-500">
+      <!-- Mystery Card / Emblem View -->
+      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-[#0E2966] to-[#091B45] border-2 border-[#B7D1EC]/30 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px] transition-all duration-500">
 
         <!-- UNREVEALED STATE -->
         <div id="unrevealedView" class="flex flex-col items-center text-center space-y-5 w-full">
-          <!-- Vinyl Disc -->
+          <!-- Draaiend Wereldbol & Fakkel Medaillon -->
           <div class="relative w-44 h-44 flex items-center justify-center">
-            <div id="vinylDisc" class="w-44 h-44 rounded-full bg-zinc-950 border-4 border-zinc-800 shadow-[0_0_40px_rgba(236,72,153,0.25)] flex items-center justify-center vinyl-spin vinyl-paused relative">
-              <!-- Vinyl Grooves -->
-              <div class="w-36 h-36 rounded-full border border-zinc-800/80 flex items-center justify-center">
-                <div class="w-28 h-28 rounded-full border border-zinc-800/80 flex items-center justify-center">
-                  <div class="w-20 h-20 rounded-full border border-zinc-800/80 flex items-center justify-center">
-                    <!-- Center Neon Label -->
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-500 flex items-center justify-center shadow-inner">
-                      <div class="w-4 h-4 rounded-full bg-zinc-950 border-2 border-white/40"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div class="absolute inset-0 rounded-full border-2 border-dashed border-[#B7D1EC]/35"></div>
+            <div id="vinylDisc" class="w-36 h-36 rounded-full bg-[#071538] border-4 border-[#B7D1EC] shadow-lg flex items-center justify-center emblem-spin emblem-paused p-1">
+              <svg class="w-full h-full" viewBox="0 0 100 100">
+                <use href="#torch-globe-icon"></use>
+              </svg>
             </div>
           </div>
 
           <!-- Equalizer Bars -->
           <div class="flex items-end justify-center gap-1.5 h-7">
-            <span class="eq-bar eq-paused w-1.5 bg-pink-500 rounded-full" style="animation-delay: 0.0s"></span>
-            <span class="eq-bar eq-paused w-1.5 bg-purple-500 rounded-full" style="animation-delay: 0.2s"></span>
-            <span class="eq-bar eq-paused w-1.5 bg-cyan-400 rounded-full" style="animation-delay: 0.4s"></span>
-            <span class="eq-bar eq-paused w-1.5 bg-pink-500 rounded-full" style="animation-delay: 0.1s"></span>
-            <span class="eq-bar eq-paused w-1.5 bg-purple-500 rounded-full" style="animation-delay: 0.3s"></span>
+            <span class="eq-bar eq-paused w-1.5 bg-[#B7D1EC] rounded-full" style="animation-delay: 0.0s"></span>
+            <span class="eq-bar eq-paused w-1.5 bg-[#8FB4D9] rounded-full" style="animation-delay: 0.2s"></span>
+            <span class="eq-bar eq-paused w-1.5 bg-[#D6E6F5] rounded-full" style="animation-delay: 0.4s"></span>
+            <span class="eq-bar eq-paused w-1.5 bg-[#B7D1EC] rounded-full" style="animation-delay: 0.1s"></span>
+            <span class="eq-bar eq-paused w-1.5 bg-[#8FB4D9] rounded-full" style="animation-delay: 0.3s"></span>
           </div>
 
           <div>
-            <h3 class="text-xl font-black text-white tracking-tight">??? MYSTERY TRACK ???</h3>
-            <p class="text-xs text-zinc-400 mt-1">Bestandsnaam en titel zijn verborgen</p>
+            <h3 class="text-xl font-black text-[#D6E6F5] tracking-tight">??? MYSTERY TRACK ???</h3>
+            <p class="text-xs text-[#8FB4D9] mt-1">Bestandsnaam en titel zijn verborgen</p>
           </div>
         </div>
 
         <!-- REVEALED STATE -->
         <div id="revealedView" class="hidden flex-col items-center text-center space-y-4 w-full py-2">
-          <span class="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-            Ontmaskerd!
+          <span class="text-xs font-bold uppercase tracking-widest text-[#071538] bg-[#B7D1EC] px-3.5 py-1 rounded-full">
+            Ontmaskerd
           </span>
 
-          <div id="revealYearBox" class="py-2 px-6 rounded-2xl bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-cyan-500/20 border border-pink-500/30">
-            <span class="text-[11px] uppercase tracking-widest text-zinc-400 block">Jaartal</span>
-            <span id="revealYear" class="text-5xl font-black bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
+          <div id="revealYearBox" class="py-2 px-6 rounded-2xl bg-[#071538]/80 border border-[#B7D1EC]/40">
+            <span class="text-[11px] uppercase tracking-widest text-[#8FB4D9] block">Jaartal</span>
+            <span id="revealYear" class="text-5xl font-black text-[#D6E6F5]">
               ????
             </span>
           </div>
 
           <div class="space-y-1 max-w-full px-2">
-            <h3 id="revealTitle" class="text-2xl font-black text-white break-words leading-tight">
+            <h3 id="revealTitle" class="text-2xl font-black text-[#D6E6F5] break-words leading-tight">
               Onbekende Titel
             </h3>
-            <p id="revealArtist" class="text-base font-semibold text-purple-300 break-words">
+            <p id="revealArtist" class="text-base font-semibold text-[#B7D1EC] break-words">
               Onbekende Artiest
             </p>
           </div>
 
-          <p id="revealRawFilename" class="text-[11px] text-zinc-500 font-mono break-all pt-2 border-t border-zinc-800/80 w-full">
+          <p id="revealRawFilename" class="text-[11px] text-[#8FB4D9] font-mono break-all pt-2 border-t border-[#B7D1EC]/20 w-full">
             bestand.mp3
           </p>
         </div>
       </div>
 
       <!-- Error Message Box -->
-      <div id="audioErrorBox" class="hidden p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs text-center">
+      <div id="audioErrorBox" class="hidden p-3.5 rounded-xl bg-red-950/70 border border-red-400/40 text-red-200 text-xs text-center">
         Kan audiobestand niet laden. Controleer of je GitHub repository <strong>publiek</strong> staat en of het bestand bestaat.
       </div>
 
-      <!-- Audio Controls (Zonder tijdsbalk die bestandsduur weergeeft) -->
+      <!-- Audio Controls -->
       <div class="flex items-center justify-center gap-5">
-        <button onclick="seekAudio(-10)" class="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white active:scale-90 transition" title="-10 sec">
-          <span class="text-xs font-bold">-10s</span>
+        <button onclick="seekAudio(-10)" class="w-12 h-12 rounded-full bg-[#0B2257] border border-[#B7D1EC]/30 flex items-center justify-center text-[#B7D1EC] hover:text-[#D6E6F5] active:scale-90 transition" title="-10 sec">
+          <span class="text-xs font-extrabold">-10s</span>
         </button>
 
-        <button id="btnPlayPause" onclick="togglePlayPause()" class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center text-white shadow-xl shadow-pink-500/30 active:scale-90 transition">
+        <button id="btnPlayPause" onclick="togglePlayPause()" class="w-16 h-16 rounded-full bg-[#B7D1EC] hover:bg-[#D6E6F5] flex items-center justify-center text-[#071538] shadow-lg active:scale-90 transition">
           <svg id="iconPlay" class="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 24 24">
             <path d="M8 5v14l11-7z"/>
           </svg>
@@ -231,19 +246,19 @@
           </svg>
         </button>
 
-        <button onclick="seekAudio(10)" class="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-white active:scale-90 transition" title="+10 sec">
-          <span class="text-xs font-bold">+10s</span>
+        <button onclick="seekAudio(10)" class="w-12 h-12 rounded-full bg-[#0B2257] border border-[#B7D1EC]/30 flex items-center justify-center text-[#B7D1EC] hover:text-[#D6E6F5] active:scale-90 transition" title="+10 sec">
+          <span class="text-xs font-extrabold">+10s</span>
         </button>
       </div>
 
       <!-- Action Buttons: Reveal & Next Scan -->
       <div class="space-y-3 pt-2">
-        <button id="btnReveal" onclick="handleRevealClick()" class="w-full py-4 px-5 rounded-2xl font-black text-base bg-zinc-900 border-2 border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10 active:scale-95 transition shadow-lg">
-          👀 Onthul Titel & Jaartal
+        <button id="btnReveal" onclick="handleRevealClick()" class="w-full py-4 px-5 rounded-2xl font-black text-base bg-[#0B2257] border-2 border-[#B7D1EC] text-[#D6E6F5] hover:bg-[#B7D1EC]/15 active:scale-95 transition shadow-md">
+          Onthul Titel & Jaartal
         </button>
 
-        <button onclick="nextCard()" class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm bg-zinc-800/80 text-zinc-300 hover:bg-zinc-800 active:scale-95 transition">
-          📷 Volgende Kaart Scannen
+        <button onclick="nextCard()" class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm bg-[#0B2257]/70 border border-[#B7D1EC]/20 text-[#8FB4D9] hover:text-[#D6E6F5] active:scale-95 transition">
+          Volgende Kaart Scannen
         </button>
       </div>
     </section>
@@ -251,52 +266,52 @@
     <!-- TAB 3: QR GENERATOR VOOR GITHUB -->
     <section id="tab-generator" class="hidden space-y-5">
       <div class="space-y-1">
-        <h2 class="text-xl font-bold text-white">GitHub QR Generator</h2>
-        <p class="text-xs text-zinc-400">
+        <h2 class="text-xl font-extrabold text-[#D6E6F5]">GitHub QR Generator</h2>
+        <p class="text-xs text-[#8FB4D9]">
           Plak een GitHub-link. De app zet hem automatisch om naar een directe audio-stream link en maakt een QR-code.
         </p>
       </div>
 
-      <div class="space-y-3 bg-zinc-900/70 p-4 rounded-2xl border border-zinc-800">
+      <div class="space-y-3 bg-[#0B2257] p-4 rounded-2xl border border-[#B7D1EC]/25">
         <div>
-          <label class="block text-xs font-semibold text-zinc-400 mb-1">GitHub URL naar audiobestand (.mp3 / .m4a / .wav)</label>
-          <input id="genGithubUrl" type="url" placeholder="https://github.com/gebruiker/repo/blob/main/1985%20-%20Queen%20-%20Radio%20Ga%20Ga.mp3" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-pink-500" />
+          <label class="block text-xs font-semibold text-[#B7D1EC] mb-1">GitHub URL naar audiobestand (.mp3 / .m4a / .wav)</label>
+          <input id="genGithubUrl" type="url" placeholder="https://github.com/TheStripedZebra/HitsterApgen/blob/main/01-wat-liefde-doet---zang.mp3" class="w-full bg-[#071538] border border-[#B7D1EC]/25 rounded-xl px-3 py-2.5 text-xs text-[#D6E6F5] placeholder-[#6E93BA] focus:outline-none focus:border-[#B7D1EC]" />
         </div>
 
-        <button onclick="generateGitHubQR()" class="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-lg active:scale-95 transition">
+        <button onclick="generateGitHubQR()" class="w-full py-3 rounded-xl font-extrabold text-sm bg-[#B7D1EC] hover:bg-[#D6E6F5] text-[#071538] shadow-md active:scale-95 transition">
           Genereer QR-Code
         </button>
       </div>
 
       <!-- Output QR -->
-      <div id="qrOutputContainer" class="hidden flex-col items-center bg-white text-zinc-950 p-6 rounded-2xl space-y-3 shadow-xl">
-        <div id="qrcode" class="p-2 bg-white"></div>
-        <p id="qrLabelText" class="text-xs font-bold text-center text-zinc-700 break-all"></p>
-        <p class="text-[10px] text-zinc-400 text-center">Maak een screenshot of druk af op je speelkaart</p>
+      <div id="qrOutputContainer" class="hidden flex-col items-center bg-[#D6E6F5] text-[#071538] p-6 rounded-2xl space-y-3 shadow-xl border-2 border-[#B7D1EC]">
+        <div id="qrcode" class="p-2 bg-white rounded-lg"></div>
+        <p id="qrLabelText" class="text-xs font-extrabold text-center text-[#0B2257] break-all"></p>
+        <p class="text-[10px] text-[#0B2257]/70 text-center">Maak een screenshot of druk af op je speelkaart</p>
       </div>
     </section>
 
   </main>
 
   <!-- Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-zinc-950/95 backdrop-blur-lg border-t border-zinc-800/90 px-4 py-2.5 flex justify-around items-center z-40">
-    <button onclick="switchTab('scanner')" id="nav-scanner" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-pink-400 transition">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#071538]/95 backdrop-blur-lg border-t border-[#B7D1EC]/20 px-4 py-2.5 flex justify-around items-center z-40">
+    <button onclick="switchTab('scanner')" id="nav-scanner" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-[#D6E6F5] transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M7 12h10" />
       </svg>
       <span class="text-[11px] font-bold">Scannen</span>
     </button>
 
-    <button onclick="switchTab('player')" id="nav-player" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-zinc-500 hover:text-zinc-300 transition">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <button onclick="switchTab('player')" id="nav-player" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-[#6E93BA] hover:text-[#B7D1EC] transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <span class="text-[11px] font-bold">Speler</span>
     </button>
 
-    <button onclick="switchTab('generator')" id="nav-generator" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-zinc-500 hover:text-zinc-300 transition">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <button onclick="switchTab('generator')" id="nav-generator" class="flex flex-col items-center gap-1 py-1 px-4 rounded-xl text-[#6E93BA] hover:text-[#B7D1EC] transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
       </svg>
       <span class="text-[11px] font-bold">QR Maken</span>
@@ -320,22 +335,20 @@
 
     const audioEl = document.getElementById('secretAudioPlayer');
 
-    // Tab Navigatie
     function switchTab(tabName) {
       ['scanner', 'player', 'generator'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
         const navBtn = document.getElementById(`nav-${t}`);
-        navBtn.classList.remove('text-pink-400');
-        navBtn.classList.add('text-zinc-500');
+        navBtn.classList.remove('text-[#D6E6F5]');
+        navBtn.classList.add('text-[#6E93BA]');
       });
 
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
       const activeNav = document.getElementById(`nav-${tabName}`);
-      activeNav.classList.remove('text-zinc-500');
-      activeNav.classList.add('text-pink-400');
+      activeNav.classList.remove('text-[#6E93BA]');
+      activeNav.classList.add('text-[#D6E6F5]');
     }
 
-    // Zet standaard GitHub blob URL's automatisch om naar raw.githubusercontent.com
     function normalizeGitHubUrl(url) {
       let cleanUrl = url.trim();
       if (cleanUrl.includes('github.com') && cleanUrl.includes('/blob/')) {
@@ -346,29 +359,24 @@
       return cleanUrl;
     }
 
-    // Haal artiest, titel en jaartal slim uit de bestandsnaam
     function parseTrackMetadata(url) {
       try {
         const urlObj = new URL(url);
         const pathParts = urlObj.pathname.split('/');
         let rawFilename = decodeURIComponent(pathParts[pathParts.length - 1] || 'Onbekend.mp3');
 
-        // Verwijder extensie (.mp3, .wav, .m4a, .ogg, etc.)
         let nameWithoutExt = rawFilename.replace(/\.[^/.]+$/, '').replace(/_/g, ' ').trim();
 
-        // Zoek een jaartal (bijv. 1950 - 2029)
         let year = '????';
         const yearMatch = nameWithoutExt.match(/\b(19\d{2}|20[0-2]\d)\b/);
         if (yearMatch) {
           year = yearMatch[1];
-          // Verwijder jaartal en eventuele haakjes/streepjes eromheen voor schone titel/artiest
           nameWithoutExt = nameWithoutExt
             .replace(new RegExp(`\\(?\\b${year}\\b\\)?`), '')
             .replace(/^\s*-\s*|\s*-\s*$/g, '')
             .trim();
         }
 
-        // Splits op ' - ' voor Artiest en Titel
         let artist = 'GitHub Audio Track';
         let title = nameWithoutExt;
 
@@ -396,9 +404,8 @@
       }
     }
 
-    // Overschrijf telefoon vergrendelscherm zodat de bestandsnaam niet lekt
     function applySpoilerFreeLockscreen() {
-      document.title = 'Hitster Mystery Track 🎵';
+      document.title = 'Hitster Mystery Track';
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: '??? Mystery Track ???',
@@ -408,7 +415,6 @@
       }
     }
 
-    // Start QR Scanner
     async function startScanner() {
       if (isScanning) return;
 
@@ -422,7 +428,6 @@
           { facingMode: "environment" },
           { fps: 12, qrbox: { width: 230, height: 230 } },
           (decodedText) => {
-            // QR-code gevonden!
             stopScanner();
             loadAndPlayTrack(decodedText);
           },
@@ -436,7 +441,6 @@
       }
     }
 
-    // Stop QR Scanner
     async function stopScanner() {
       if (html5QrCode && isScanning) {
         try {
@@ -449,18 +453,15 @@
       document.getElementById('btnStopScan').classList.add('hidden');
     }
 
-    // Handmatige invoer testen
     function handleManualInput() {
       const val = document.getElementById('manualUrlInput').value;
       if (!val) return;
       loadAndPlayTrack(val);
     }
 
-    // Laad en speel gescande QR-link af zonder bestandsnaam te tonen
     function loadAndPlayTrack(scannedContent) {
       let targetUrl = scannedContent.trim();
 
-      // Ondersteuning voor JSON QR-codes (mocht iemand die ook gebruiken)
       if (targetUrl.startsWith('{')) {
         try {
           const data = JSON.parse(targetUrl);
@@ -481,14 +482,11 @@
         currentTrackInfo = parseTrackMetadata(targetUrl);
       }
 
-      // Reset UI naar verborgen modus
       resetRevealUI();
       document.getElementById('audioErrorBox').classList.add('hidden');
 
-      // Schakel naar speler
       switchTab('player');
 
-      // Laad audiobestand
       audioEl.src = currentTrackInfo.rawUrl;
       audioEl.load();
 
@@ -505,7 +503,6 @@
         });
     }
 
-    // Audio Events
     audioEl.addEventListener('play', () => {
       updatePlayingState(true);
       applySpoilerFreeLockscreen();
@@ -534,13 +531,13 @@
       const statusText = document.getElementById('playerStatusText');
 
       if (isPlaying) {
-        vinyl.classList.remove('vinyl-paused');
+        vinyl.classList.remove('emblem-paused');
         eqBars.forEach(b => b.classList.remove('eq-paused'));
         iconPlay.classList.add('hidden');
         iconPause.classList.remove('hidden');
         statusText.textContent = 'Muziek speelt af...';
       } else {
-        vinyl.classList.add('vinyl-paused');
+        vinyl.classList.add('emblem-paused');
         eqBars.forEach(b => b.classList.add('eq-paused'));
         iconPlay.classList.remove('hidden');
         iconPause.classList.add('hidden');
@@ -564,19 +561,17 @@
       audioEl.currentTime = Math.max(0, Math.min(audioEl.duration, audioEl.currentTime + seconds));
     }
 
-    // Twee-staps Onthul-knop (voorkomt per ongeluk klikken)
     function handleRevealClick() {
       const btn = document.getElementById('btnReveal');
 
       if (!revealConfirmStep) {
         revealConfirmStep = true;
-        btn.textContent = '⚠️ Zeker weten? Tik nogmaals om te onthullen';
-        btn.classList.remove('border-cyan-500/50', 'text-cyan-300');
-        btn.classList.add('border-amber-500', 'text-amber-300', 'bg-amber-500/10');
+        btn.textContent = 'Zeker weten? Tik nogmaals om te onthullen';
+        btn.classList.remove('border-[#B7D1EC]', 'text-[#D6E6F5]');
+        btn.classList.add('border-amber-300', 'text-amber-200', 'bg-amber-950/50');
         return;
       }
 
-      // Onthul de gegevens
       document.getElementById('unrevealedView').classList.add('hidden');
       const revealedView = document.getElementById('revealedView');
       revealedView.classList.remove('hidden');
@@ -599,9 +594,9 @@
       revealedView.classList.remove('flex');
 
       const btn = document.getElementById('btnReveal');
-      btn.classList.remove('hidden', 'border-amber-500', 'text-amber-300', 'bg-amber-500/10');
-      btn.classList.add('border-cyan-500/50', 'text-cyan-300');
-      btn.textContent = '👀 Onthul Titel & Jaartal';
+      btn.classList.remove('hidden', 'border-amber-300', 'text-amber-200', 'bg-amber-950/50');
+      btn.classList.add('border-[#B7D1EC]', 'text-[#D6E6F5]');
+      btn.textContent = 'Onthul Titel & Jaartal';
     }
 
     function nextCard() {
@@ -613,7 +608,6 @@
       startScanner();
     }
 
-    // QR-code Generator voor GitHub links
     function generateGitHubQR() {
       const inputUrl = document.getElementById('genGithubUrl').value.trim();
       if (!inputUrl) return;
@@ -626,7 +620,7 @@
         text: rawUrl,
         width: 200,
         height: 200,
-        colorDark: "#000000",
+        colorDark: "#071538",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
