@@ -334,30 +334,14 @@
       }
     }
 
-    async function resetScannerElement() {
-      if (html5QrCode) {
+    async function ensureScannerInstance() {
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader", { verbose: false });
+      } else if (html5QrCode.isScanning) {
         try {
-          if (html5QrCode.isScanning) {
-            await html5QrCode.stop();
-          }
-          await html5QrCode.clear();
+          await html5QrCode.stop();
         } catch (e) {}
       }
-      const readerEl = document.getElementById('reader');
-      if (readerEl) {
-        readerEl.innerHTML = '';
-      }
-      html5QrCode = new Html5Qrcode("reader", { verbose: false });
-    }
-
-    async function tryStartWithConfig(cameraIdOrConfig, qrConfig, onScanSuccess) {
-      await resetScannerElement();
-      await html5QrCode.start(
-        cameraIdOrConfig,
-        qrConfig,
-        onScanSuccess,
-        () => {}
-      );
     }
 
     async function startScanner() {
@@ -393,40 +377,46 @@
         loadAndPlayTrack(decodedText);
       };
 
-      const attempts = [
-        () => tryStartWithConfig({ facingMode: "environment" }, qrConfig, onScanSuccess),
-        () => tryStartWithConfig({ facingMode: "user" }, qrConfig, onScanSuccess),
-        async () => {
-          const devices = await Html5Qrcode.getCameras();
-          if (!devices || devices.length === 0) {
-            throw new Error("Geen camera-apparaten gevonden.");
-          }
-          const backCam = devices.find(d => /back|rear|environment|achter/i.test(d.label));
-          const chosen = backCam || devices[devices.length - 1];
-          await tryStartWithConfig(chosen.id, qrConfig, onScanSuccess);
-        }
-      ];
+      try {
+        await ensureScannerInstance();
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          qrConfig,
+          onScanSuccess,
+          () => {}
+        );
+        isScanning = true;
+        isStartingScanner = false;
+        return;
+      } catch (err) {}
 
-      let lastError = null;
-      for (const attempt of attempts) {
-        try {
-          await attempt();
-          isScanning = true;
-          isStartingScanner = false;
-          return;
-        } catch (err) {
-          lastError = err;
+      try {
+        await ensureScannerInstance();
+        const devices = await Html5Qrcode.getCameras();
+        if (!devices || devices.length === 0) {
+          throw new Error("Geen camera-apparaten gevonden.");
         }
+        const backCam = devices.find(d => /back|rear|environment|achter/i.test(d.label));
+        const chosen = backCam || devices[devices.length - 1];
+        await html5QrCode.start(
+          chosen.id,
+          qrConfig,
+          onScanSuccess,
+          () => {}
+        );
+        isScanning = true;
+        isStartingScanner = false;
+        return;
+      } catch (fallbackErr) {
+        isScanning = false;
+        isStartingScanner = false;
+        document.getElementById('btnStartScan').classList.remove('hidden');
+        document.getElementById('btnStopScan').classList.add('hidden');
+        const detail = (fallbackErr && (fallbackErr.name || fallbackErr.message))
+          ? ` (${fallbackErr.name || fallbackErr.message})`
+          : '';
+        setScannerMessage(`Kon de camera niet starten${detail}. Controleer of de pagina via HTTPS draait en cameratoegang is toegestaan.`);
       }
-
-      isScanning = false;
-      isStartingScanner = false;
-      await resetScannerElement();
-      document.getElementById('btnStartScan').classList.remove('hidden');
-      document.getElementById('btnStopScan').classList.add('hidden');
-
-      const detail = (lastError && (lastError.name || lastError.message)) ? ` (${lastError.name || lastError.message})` : '';
-      setScannerMessage(`Kon de camera niet starten${detail}. Sluit eventuele andere apps die de camera gebruiken, ververs de pagina of controleer of de site op HTTPS draait.`);
     }
 
     async function stopScanner() {
@@ -440,12 +430,7 @@
           if (html5QrCode.isScanning) {
             await html5QrCode.stop();
           }
-          await html5QrCode.clear();
         } catch (e) {}
-      }
-      const readerEl = document.getElementById('reader');
-      if (readerEl) {
-        readerEl.innerHTML = '';
       }
     }
 
