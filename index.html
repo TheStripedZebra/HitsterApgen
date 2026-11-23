@@ -6,7 +6,7 @@
   <title>APGEN HITSTER</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/kjua@0.1.1/dist/kjua.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
 
@@ -232,9 +232,9 @@
         </button>
       </div>
 
-      <!-- Output QR (Geïnverteerd: witte blokjes op zwarte achtergrond) -->
+      <!-- Output QR -->
       <div id="qrOutputContainer" class="hidden flex-col items-center bg-[#071538] text-[#D6E6F5] p-6 rounded-2xl space-y-3 shadow-xl border-2 border-[#B7D1EC]">
-        <div id="qrcode" class="p-2 bg-black rounded-lg"></div>
+        <div id="qrcode" class="p-3 bg-black rounded-lg flex items-center justify-center"></div>
         <p id="qrLabelText" class="text-xs font-extrabold text-center text-[#B7D1EC] break-all"></p>
         <p class="text-[10px] text-[#8FB4D9] text-center">Maak een screenshot of druk af op je speelkaart</p>
       </div>
@@ -468,7 +468,7 @@
       startScanner();
     }
 
-    // QR-code Generator voor GitHub links (geïnverteerd: witte blokjes op zwarte achtergrond)
+    // QR-code Generator met kjua (witte modules op zwarte achtergrond)
     function generateGitHubQR() {
       const inputUrl = document.getElementById('genGithubUrl').value.trim();
       if (!inputUrl) return;
@@ -477,14 +477,17 @@
       const qrContainer = document.getElementById('qrcode');
       qrContainer.innerHTML = '';
 
-      new QRCode(qrContainer, {
+      const qrCanvasOrImg = kjua({
         text: rawUrl,
-        width: 200,
-        height: 200,
-        colorDark: "#ffffff",
-        colorLight: "#000000",
-        correctLevel: QRCode.CorrectLevel.M
+        size: 200,
+        fill: '#ffffff',
+        back: '#000000',
+        ecLevel: 'M',
+        quiet: 2,
+        rounded: 0
       });
+
+      qrContainer.appendChild(qrCanvasOrImg);
 
       document.getElementById('qrLabelText').textContent = 'APGEN TRACK';
       const outputBox = document.getElementById('qrOutputContainer');
