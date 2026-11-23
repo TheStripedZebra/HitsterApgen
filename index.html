@@ -232,11 +232,11 @@
         </button>
       </div>
 
-      <!-- Output QR -->
-      <div id="qrOutputContainer" class="hidden flex-col items-center bg-[#D6E6F5] text-[#071538] p-6 rounded-2xl space-y-3 shadow-xl border-2 border-[#B7D1EC]">
-        <div id="qrcode" class="p-2 bg-white rounded-lg"></div>
-        <p id="qrLabelText" class="text-xs font-extrabold text-center text-[#0B2257] break-all"></p>
-        <p class="text-[10px] text-[#0B2257]/70 text-center">Maak een screenshot of druk af op je speelkaart</p>
+      <!-- Output QR (Geïnverteerd: witte blokjes op zwarte achtergrond) -->
+      <div id="qrOutputContainer" class="hidden flex-col items-center bg-[#071538] text-[#D6E6F5] p-6 rounded-2xl space-y-3 shadow-xl border-2 border-[#B7D1EC]">
+        <div id="qrcode" class="p-2 bg-black rounded-lg"></div>
+        <p id="qrLabelText" class="text-xs font-extrabold text-center text-[#B7D1EC] break-all"></p>
+        <p class="text-[10px] text-[#8FB4D9] text-center">Maak een screenshot of druk af op je speelkaart</p>
       </div>
     </section>
 
@@ -468,7 +468,7 @@
       startScanner();
     }
 
-    // QR-code Generator voor GitHub links (zwarte blokjes op witte achtergrond)
+    // QR-code Generator voor GitHub links (geïnverteerd: witte blokjes op zwarte achtergrond)
     function generateGitHubQR() {
       const inputUrl = document.getElementById('genGithubUrl').value.trim();
       if (!inputUrl) return;
@@ -481,8 +481,8 @@
         text: rawUrl,
         width: 200,
         height: 200,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
+        colorDark: "#ffffff",
+        colorLight: "#000000",
         correctLevel: QRCode.CorrectLevel.M
       });
 
