@@ -27,16 +27,16 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    @keyframes spinEmblem {
+    @keyframes spinVinyl {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    .emblem-spin {
-      animation: spinEmblem 8s linear infinite;
+    .vinyl-spin {
+      animation: spinVinyl 6s linear infinite;
     }
 
-    .emblem-paused {
+    .vinyl-paused {
       animation-play-state: paused;
     }
 
@@ -46,7 +46,7 @@
     }
 
     .eq-bar {
-      animation: eqBar 0.75s ease-in-out infinite;
+      animation: eqBar 0.7s ease-in-out infinite;
     }
 
     .eq-paused {
@@ -54,6 +54,7 @@
       height: 6px !important;
     }
 
+    /* Clean up html5-qrcode default UI */
     #reader {
       border: none !important;
       border-radius: 1rem;
@@ -128,7 +129,7 @@
         </button>
       </div>
 
-      <!-- Manual Test Input -->
+      <!-- Manual Test Input (Handig om GitHub link direct te testen) -->
       <div class="pt-4 border-t border-[#B7D1EC]/15">
         <p class="text-xs font-bold uppercase tracking-wider text-[#8FB4D9] mb-2">Handmatige test (zonder camera)</p>
         <div class="flex gap-2">
@@ -149,8 +150,8 @@
         </span>
       </div>
 
-      <!-- Mystery Card / Emblem View -->
-      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-[#0E2966] to-[#091B45] border-2 border-[#B7D1EC]/30 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px]">
+      <!-- Mystery Card / Vinyl View -->
+      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-[#0E2966] to-[#091B45] border-2 border-[#B7D1EC]/30 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px] transition-all duration-500">
         <div class="flex flex-col items-center text-center space-y-5 w-full">
           <!-- Draaiende apgenlogo.jpg -->
           <div class="relative w-44 h-44 flex items-center justify-center">
@@ -159,7 +160,7 @@
               id="vinylDisc"
               src="https://raw.githubusercontent.com/TheStripedZebra/HitsterApgen/main/apgenlogo.jpg"
               alt="APGEN Track"
-              class="w-36 h-36 rounded-full object-cover border-4 border-[#B7D1EC] shadow-lg emblem-spin emblem-paused"
+              class="w-36 h-36 rounded-full object-cover border-4 border-[#B7D1EC] shadow-lg vinyl-spin vinyl-paused"
             />
           </div>
 
@@ -183,7 +184,7 @@
         Kan audiobestand niet laden. Controleer of je GitHub repository <strong>publiek</strong> staat en of het bestand bestaat.
       </div>
 
-      <!-- Audio Controls -->
+      <!-- Audio Controls (Zonder tijdsbalk die bestandsduur weergeeft) -->
       <div class="flex items-center justify-center gap-5">
         <button onclick="seekAudio(-10)" class="w-12 h-12 rounded-full bg-[#0B2257] border border-[#B7D1EC]/30 flex items-center justify-center text-[#B7D1EC] hover:text-[#D6E6F5] active:scale-90 transition" title="-10 sec">
           <span class="text-xs font-extrabold">-10s</span>
@@ -276,6 +277,7 @@
     let isScanning = false;
     const audioEl = document.getElementById('secretAudioPlayer');
 
+    // Tab Navigatie
     function switchTab(tabName) {
       ['scanner', 'player', 'generator'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -290,6 +292,7 @@
       activeNav.classList.add('text-[#D6E6F5]');
     }
 
+    // Zet standaard GitHub blob URL's automatisch om naar raw.githubusercontent.com
     function normalizeGitHubUrl(url) {
       let cleanUrl = url.trim();
       if (cleanUrl.includes('github.com') && cleanUrl.includes('/blob/')) {
@@ -300,6 +303,7 @@
       return cleanUrl;
     }
 
+    // Overschrijf telefoon vergrendelscherm zodat de bestandsnaam niet lekt
     function applySpoilerFreeLockscreen() {
       document.title = 'APGEN HITSTER';
       if ('mediaSession' in navigator) {
@@ -314,6 +318,7 @@
       }
     }
 
+    // Start QR Scanner
     async function startScanner() {
       if (isScanning) return;
 
@@ -325,8 +330,9 @@
       try {
         await html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 230, height: 230 } },
+          { fps: 12, qrbox: { width: 230, height: 230 } },
           (decodedText) => {
+            // QR-code gevonden!
             stopScanner();
             loadAndPlayTrack(decodedText);
           },
@@ -340,6 +346,7 @@
       }
     }
 
+    // Stop QR Scanner
     async function stopScanner() {
       if (html5QrCode && isScanning) {
         try {
@@ -352,12 +359,14 @@
       document.getElementById('btnStopScan').classList.add('hidden');
     }
 
+    // Handmatige invoer testen
     function handleManualInput() {
       const val = document.getElementById('manualUrlInput').value;
       if (!val) return;
       loadAndPlayTrack(val);
     }
 
+    // Laad en speel gescande QR-link af zonder bestandsnaam te tonen
     function loadAndPlayTrack(scannedContent) {
       let targetUrl = scannedContent.trim();
 
@@ -392,6 +401,7 @@
         });
     }
 
+    // Audio Events
     audioEl.addEventListener('play', () => {
       updatePlayingState(true);
       applySpoilerFreeLockscreen();
@@ -420,13 +430,13 @@
       const statusText = document.getElementById('playerStatusText');
 
       if (isPlaying) {
-        vinyl.classList.remove('emblem-paused');
+        vinyl.classList.remove('vinyl-paused');
         eqBars.forEach(b => b.classList.remove('eq-paused'));
         iconPlay.classList.add('hidden');
         iconPause.classList.remove('hidden');
         statusText.textContent = 'Muziek speelt af...';
       } else {
-        vinyl.classList.add('emblem-paused');
+        vinyl.classList.add('vinyl-paused');
         eqBars.forEach(b => b.classList.add('eq-paused'));
         iconPlay.classList.remove('hidden');
         iconPause.classList.add('hidden');
@@ -455,8 +465,10 @@
       audioEl.removeAttribute('src');
       updatePlayingState(false);
       switchTab('scanner');
+      startScanner();
     }
 
+    // QR-code Generator voor GitHub links
     function generateGitHubQR() {
       const inputUrl = document.getElementById('genGithubUrl').value.trim();
       if (!inputUrl) return;
