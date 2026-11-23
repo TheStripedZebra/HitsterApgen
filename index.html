@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>APGEN HITSTER</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
@@ -53,36 +53,6 @@
       animation: none !important;
       height: 6px !important;
     }
-
-    /* Clean up html5-qrcode default UI */
-    #reader {
-      border: none !important;
-      border-radius: 1rem;
-      overflow: hidden;
-    }
-    #reader video {
-      object-fit: cover !important;
-      border-radius: 1rem;
-    }
-    #reader__scan_region {
-      background: #050f29;
-    }
-    #reader__dashboard_section_csr span,
-    #reader__dashboard_section_swaplink,
-    #reader__status_span {
-      display: none !important;
-    }
-    #reader button {
-      background-color: #B7D1EC !important;
-      color: #071538 !important;
-      border: none !important;
-      padding: 10px 22px !important;
-      border-radius: 9999px !important;
-      font-weight: 800 !important;
-      font-size: 14px !important;
-      margin: 10px auto !important;
-      cursor: pointer !important;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between max-w-md mx-auto bg-[#071538] relative overflow-x-hidden text-[#D6E6F5]">
@@ -116,7 +86,20 @@
 
       <!-- Camera Viewport -->
       <div class="relative rounded-2xl bg-[#0B2257] border-2 border-[#B7D1EC]/30 p-2 shadow-xl">
-        <div id="reader" class="w-full min-h-[280px] bg-[#050f29] flex items-center justify-center rounded-xl overflow-hidden"></div>
+        <div class="relative w-full h-[300px] bg-[#050f29] rounded-xl overflow-hidden flex items-center justify-center">
+          <video id="cameraVideo" playsinline autoplay muted class="w-full h-full object-cover hidden"></video>
+          <canvas id="scanCanvas" class="hidden"></canvas>
+
+          <div id="cameraPlaceholder" class="text-center px-6 space-y-2">
+            <p class="text-sm font-bold text-[#B7D1EC]">Camera staat uit</p>
+            <p class="text-xs text-[#8FB4D9]">Tik op "Camera Starten" om QR-codes te scannen.</p>
+          </div>
+
+          <!-- Scan Kader -->
+          <div id="scanOverlay" class="hidden pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div class="w-56 h-56 rounded-2xl border-2 border-[#B7D1EC] shadow-[0_0_0_9999px_rgba(5,15,41,0.45)]"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Scanner Controls -->
@@ -273,9 +256,20 @@
   <script>
     const APGEN_LOGO_URL = "https://raw.githubusercontent.com/TheStripedZebra/HitsterApgen/main/apgenlogo.jpg";
 
-    let html5QrCode = null;
+    let cameraStream = null;
+    let scanAnimationId = null;
     let isScanning = false;
+    let barcodeDetector = null;
+    let lastScanTime = 0;
+
     const audioEl = document.getElementById('secretAudioPlayer');
+    const videoEl = document.getElementById('cameraVideo');
+    const canvasEl = document.getElementById('scanCanvas');
+    const canvasCtx = canvasEl.getContext('2d', { willReadFrequently: true });
+
+    if ('BarcodeDetector' in window) {
+      barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+    }
 
     // Tab Navigatie
     function switchTab(tabName) {
@@ -290,6 +284,10 @@
       const activeNav = document.getElementById(`nav-${tabName}`);
       activeNav.classList.remove('text-[#6E93BA]');
       activeNav.classList.add('text-[#D6E6F5]');
+
+      if (tabName !== 'scanner' && isScanning) {
+        stopScanner();
+      }
     }
 
     // Zet standaard GitHub blob URL's automatisch om naar raw.githubusercontent.com
@@ -318,43 +316,119 @@
       }
     }
 
-    // Start QR Scanner
+    // Start snelle QR Scanner (native BarcodeDetector + jsQR fallback)
     async function startScanner() {
       if (isScanning) return;
 
       document.getElementById('btnStartScan').classList.add('hidden');
       document.getElementById('btnStopScan').classList.remove('hidden');
 
-      html5QrCode = new Html5Qrcode("reader");
-
       try {
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          { fps: 12, qrbox: { width: 230, height: 230 } },
-          (decodedText) => {
-            // QR-code gevonden!
-            stopScanner();
-            loadAndPlayTrack(decodedText);
-          },
-          () => {}
-        );
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            focusMode: "continuous"
+          }
+        });
+
+        // Probeer continue autofocus in te stellen indien ondersteund
+        const videoTrack = cameraStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.getCapabilities) {
+          const caps = videoTrack.getCapabilities();
+          const advanced = [];
+          if (caps.focusMode && caps.focusMode.includes('continuous')) {
+            advanced.push({ focusMode: 'continuous' });
+          }
+          if (advanced.length > 0 && videoTrack.applyConstraints) {
+            videoTrack.applyConstraints({ advanced }).catch(() => {});
+          }
+        }
+
+        videoEl.srcObject = cameraStream;
+        videoEl.classList.remove('hidden');
+        document.getElementById('cameraPlaceholder').classList.add('hidden');
+        document.getElementById('scanOverlay').classList.remove('hidden');
+
+        await videoEl.play();
         isScanning = true;
+        scanAnimationId = requestAnimationFrame(scanFrame);
       } catch (err) {
         alert("Kon camera niet starten. Geef cameratoegang in je browser of gebruik HTTPS.");
-        document.getElementById('btnStartScan').classList.remove('hidden');
-        document.getElementById('btnStopScan').classList.add('hidden');
+        stopScanner();
+      }
+    }
+
+    async function scanFrame(now) {
+      if (!isScanning) return;
+
+      if (videoEl.readyState >= videoEl.HAVE_ENOUGH_DATA && now - lastScanTime > 90) {
+        lastScanTime = now;
+
+        const vw = videoEl.videoWidth;
+        const vh = videoEl.videoHeight;
+
+        if (vw > 0 && vh > 0) {
+          let foundValue = null;
+
+          // 1. Snelle native BarcodeDetector (indien beschikbaar in browser)
+          if (barcodeDetector) {
+            try {
+              const codes = await barcodeDetector.detect(videoEl);
+              if (codes && codes.length > 0 && codes[0].rawValue) {
+                foundValue = codes[0].rawValue;
+              }
+            } catch (e) {}
+          }
+
+          // 2. Fallback via canvas + jsQR
+          if (!foundValue && typeof jsQR === 'function') {
+            const maxDim = 640;
+            const scale = Math.min(1, maxDim / Math.max(vw, vh));
+            canvasEl.width = Math.floor(vw * scale);
+            canvasEl.height = Math.floor(vh * scale);
+            canvasCtx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+
+            const imageData = canvasCtx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+            const qrResult = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "attemptBoth"
+            });
+
+            if (qrResult && qrResult.data) {
+              foundValue = qrResult.data;
+            }
+          }
+
+          if (foundValue) {
+            stopScanner();
+            loadAndPlayTrack(foundValue);
+            return;
+          }
+        }
+      }
+
+      if (isScanning) {
+        scanAnimationId = requestAnimationFrame(scanFrame);
       }
     }
 
     // Stop QR Scanner
-    async function stopScanner() {
-      if (html5QrCode && isScanning) {
-        try {
-          await html5QrCode.stop();
-          html5QrCode.clear();
-        } catch (e) {}
-      }
+    function stopScanner() {
       isScanning = false;
+      if (scanAnimationId) {
+        cancelAnimationFrame(scanAnimationId);
+        scanAnimationId = null;
+      }
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      videoEl.srcObject = null;
+      videoEl.classList.add('hidden');
+      document.getElementById('scanOverlay').classList.add('hidden');
+      document.getElementById('cameraPlaceholder').classList.remove('hidden');
       document.getElementById('btnStartScan').classList.remove('hidden');
       document.getElementById('btnStopScan').classList.add('hidden');
     }
