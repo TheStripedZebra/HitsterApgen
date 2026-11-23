@@ -118,9 +118,6 @@
         <div id="reader" class="w-full min-h-[280px] bg-[#050f29] flex items-center justify-center rounded-xl overflow-hidden"></div>
       </div>
 
-      <!-- Scanner Status / Melding -->
-      <p id="scannerMessage" class="hidden text-xs text-center text-amber-200 bg-amber-950/60 border border-amber-400/30 rounded-xl px-3 py-2 break-words"></p>
-
       <!-- Scanner Controls -->
       <div class="flex gap-3">
         <button id="btnStartScan" onclick="startScanner()" class="flex-1 py-3.5 px-4 rounded-xl font-extrabold text-sm bg-[#B7D1EC] hover:bg-[#D6E6F5] text-[#071538] shadow-md active:scale-95 transition">
@@ -277,20 +274,7 @@
 
     let html5QrCode = null;
     let isScanning = false;
-    let isStartingScanner = false;
-
     const audioEl = document.getElementById('secretAudioPlayer');
-
-    function setScannerMessage(msg) {
-      const el = document.getElementById('scannerMessage');
-      if (!msg) {
-        el.textContent = '';
-        el.classList.add('hidden');
-      } else {
-        el.textContent = msg;
-        el.classList.remove('hidden');
-      }
-    }
 
     function switchTab(tabName) {
       ['scanner', 'player', 'generator'].forEach(t => {
@@ -304,10 +288,6 @@
       const activeNav = document.getElementById(`nav-${tabName}`);
       activeNav.classList.remove('text-[#6E93BA]');
       activeNav.classList.add('text-[#D6E6F5]');
-
-      if (tabName !== 'scanner' && isScanning) {
-        stopScanner();
-      }
     }
 
     function normalizeGitHubUrl(url) {
@@ -334,104 +314,42 @@
       }
     }
 
-    async function ensureScannerInstance() {
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader", { verbose: false });
-      } else if (html5QrCode.isScanning) {
-        try {
-          await html5QrCode.stop();
-        } catch (e) {}
-      }
-    }
-
     async function startScanner() {
-      if (isScanning || isStartingScanner) return;
+      if (isScanning) return;
 
-      if (!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-        setScannerMessage("Cameratoegang vereist een beveiligde verbinding (HTTPS) of localhost.");
-        return;
-      }
-
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setScannerMessage("Deze browser ondersteunt geen camera-toegang via getUserMedia.");
-        return;
-      }
-
-      isStartingScanner = true;
-      setScannerMessage('');
       document.getElementById('btnStartScan').classList.add('hidden');
       document.getElementById('btnStopScan').classList.remove('hidden');
 
-      const qrConfig = {
-        fps: 12,
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const boxSize = Math.max(180, Math.min(250, Math.floor(minEdge * 0.72)));
-          return { width: boxSize, height: boxSize };
-        }
-      };
-
-      const onScanSuccess = (decodedText) => {
-        if (!decodedText) return;
-        stopScanner();
-        loadAndPlayTrack(decodedText);
-      };
+      html5QrCode = new Html5Qrcode("reader");
 
       try {
-        await ensureScannerInstance();
         await html5QrCode.start(
           { facingMode: "environment" },
-          qrConfig,
-          onScanSuccess,
+          { fps: 10, qrbox: { width: 230, height: 230 } },
+          (decodedText) => {
+            stopScanner();
+            loadAndPlayTrack(decodedText);
+          },
           () => {}
         );
         isScanning = true;
-        isStartingScanner = false;
-        return;
-      } catch (err) {}
-
-      try {
-        await ensureScannerInstance();
-        const devices = await Html5Qrcode.getCameras();
-        if (!devices || devices.length === 0) {
-          throw new Error("Geen camera-apparaten gevonden.");
-        }
-        const backCam = devices.find(d => /back|rear|environment|achter/i.test(d.label));
-        const chosen = backCam || devices[devices.length - 1];
-        await html5QrCode.start(
-          chosen.id,
-          qrConfig,
-          onScanSuccess,
-          () => {}
-        );
-        isScanning = true;
-        isStartingScanner = false;
-        return;
-      } catch (fallbackErr) {
-        isScanning = false;
-        isStartingScanner = false;
+      } catch (err) {
+        alert("Kon camera niet starten. Geef cameratoegang in je browser of gebruik HTTPS.");
         document.getElementById('btnStartScan').classList.remove('hidden');
         document.getElementById('btnStopScan').classList.add('hidden');
-        const detail = (fallbackErr && (fallbackErr.name || fallbackErr.message))
-          ? ` (${fallbackErr.name || fallbackErr.message})`
-          : '';
-        setScannerMessage(`Kon de camera niet starten${detail}. Controleer of de pagina via HTTPS draait en cameratoegang is toegestaan.`);
       }
     }
 
     async function stopScanner() {
-      isScanning = false;
-      isStartingScanner = false;
-      document.getElementById('btnStartScan').classList.remove('hidden');
-      document.getElementById('btnStopScan').classList.add('hidden');
-
-      if (html5QrCode) {
+      if (html5QrCode && isScanning) {
         try {
-          if (html5QrCode.isScanning) {
-            await html5QrCode.stop();
-          }
+          await html5QrCode.stop();
+          html5QrCode.clear();
         } catch (e) {}
       }
+      isScanning = false;
+      document.getElementById('btnStartScan').classList.remove('hidden');
+      document.getElementById('btnStopScan').classList.add('hidden');
     }
 
     function handleManualInput() {
@@ -537,7 +455,6 @@
       audioEl.removeAttribute('src');
       updatePlayingState(false);
       switchTab('scanner');
-      startScanner();
     }
 
     function generateGitHubQR() {
