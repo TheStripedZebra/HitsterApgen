@@ -468,7 +468,7 @@
       startScanner();
     }
 
-    // QR-code Generator voor GitHub links
+    // QR-code Generator voor GitHub links (zwarte blokjes op witte achtergrond)
     function generateGitHubQR() {
       const inputUrl = document.getElementById('genGithubUrl').value.trim();
       if (!inputUrl) return;
@@ -481,7 +481,7 @@
         text: rawUrl,
         width: 200,
         height: 200,
-        colorDark: "#071538",
+        colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
