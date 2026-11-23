@@ -119,7 +119,7 @@
       </div>
 
       <!-- Scanner Status / Melding -->
-      <p id="scannerMessage" class="hidden text-xs text-center text-amber-200 bg-amber-950/60 border border-amber-400/30 rounded-xl px-3 py-2"></p>
+      <p id="scannerMessage" class="hidden text-xs text-center text-amber-200 bg-amber-950/60 border border-amber-400/30 rounded-xl px-3 py-2 break-words"></p>
 
       <!-- Scanner Controls -->
       <div class="flex gap-3">
@@ -334,19 +334,30 @@
       }
     }
 
-    async function ensureScannerInstance() {
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader", false);
-      } else {
+    async function resetScannerElement() {
+      if (html5QrCode) {
         try {
           if (html5QrCode.isScanning) {
             await html5QrCode.stop();
           }
           await html5QrCode.clear();
-        } catch (e) {
-          html5QrCode = new Html5Qrcode("reader", false);
-        }
+        } catch (e) {}
       }
+      const readerEl = document.getElementById('reader');
+      if (readerEl) {
+        readerEl.innerHTML = '';
+      }
+      html5QrCode = new Html5Qrcode("reader", { verbose: false });
+    }
+
+    async function tryStartWithConfig(cameraIdOrConfig, qrConfig, onScanSuccess) {
+      await resetScannerElement();
+      await html5QrCode.start(
+        cameraIdOrConfig,
+        qrConfig,
+        onScanSuccess,
+        () => {}
+      );
     }
 
     async function startScanner() {
@@ -357,16 +368,21 @@
         return;
       }
 
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setScannerMessage("Deze browser ondersteunt geen camera-toegang via getUserMedia.");
+        return;
+      }
+
       isStartingScanner = true;
       setScannerMessage('');
       document.getElementById('btnStartScan').classList.add('hidden');
       document.getElementById('btnStopScan').classList.remove('hidden');
 
-      const config = {
+      const qrConfig = {
         fps: 12,
         qrbox: (viewfinderWidth, viewfinderHeight) => {
           const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const boxSize = Math.max(180, Math.min(250, Math.floor(minEdge * 0.7)));
+          const boxSize = Math.max(180, Math.min(250, Math.floor(minEdge * 0.72)));
           return { width: boxSize, height: boxSize };
         }
       };
@@ -377,40 +393,40 @@
         loadAndPlayTrack(decodedText);
       };
 
-      try {
-        await ensureScannerInstance();
-        await html5QrCode.start(
-          { facingMode: { ideal: "environment" } },
-          config,
-          onScanSuccess,
-          () => {}
-        );
-        isScanning = true;
-      } catch (err) {
-        try {
-          await ensureScannerInstance();
-          const cameras = await Html5Qrcode.getCameras();
-          if (cameras && cameras.length > 0) {
-            const backCam = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
-            await html5QrCode.start(
-              backCam.id,
-              config,
-              onScanSuccess,
-              () => {}
-            );
-            isScanning = true;
-          } else {
-            throw new Error("Geen camera gevonden.");
+      const attempts = [
+        () => tryStartWithConfig({ facingMode: "environment" }, qrConfig, onScanSuccess),
+        () => tryStartWithConfig({ facingMode: "user" }, qrConfig, onScanSuccess),
+        async () => {
+          const devices = await Html5Qrcode.getCameras();
+          if (!devices || devices.length === 0) {
+            throw new Error("Geen camera-apparaten gevonden.");
           }
-        } catch (fallbackErr) {
-          isScanning = false;
-          document.getElementById('btnStartScan').classList.remove('hidden');
-          document.getElementById('btnStopScan').classList.add('hidden');
-          setScannerMessage("Kon de camera niet starten. Controleer of je in je browser cameratoegang hebt gegeven.");
+          const backCam = devices.find(d => /back|rear|environment|achter/i.test(d.label));
+          const chosen = backCam || devices[devices.length - 1];
+          await tryStartWithConfig(chosen.id, qrConfig, onScanSuccess);
         }
-      } finally {
-        isStartingScanner = false;
+      ];
+
+      let lastError = null;
+      for (const attempt of attempts) {
+        try {
+          await attempt();
+          isScanning = true;
+          isStartingScanner = false;
+          return;
+        } catch (err) {
+          lastError = err;
+        }
       }
+
+      isScanning = false;
+      isStartingScanner = false;
+      await resetScannerElement();
+      document.getElementById('btnStartScan').classList.remove('hidden');
+      document.getElementById('btnStopScan').classList.add('hidden');
+
+      const detail = (lastError && (lastError.name || lastError.message)) ? ` (${lastError.name || lastError.message})` : '';
+      setScannerMessage(`Kon de camera niet starten${detail}. Sluit eventuele andere apps die de camera gebruiken, ververs de pagina of controleer of de site op HTTPS draait.`);
     }
 
     async function stopScanner() {
@@ -426,6 +442,10 @@
           }
           await html5QrCode.clear();
         } catch (e) {}
+      }
+      const readerEl = document.getElementById('reader');
+      if (readerEl) {
+        readerEl.innerHTML = '';
       }
     }
 
