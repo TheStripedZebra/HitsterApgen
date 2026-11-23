@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Hitster Mystery Player</title>
+  <title>APGEN HITSTER</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -86,40 +86,21 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between max-w-md mx-auto bg-[#071538] relative overflow-x-hidden text-[#D6E6F5]">
 
-  <!-- SVG Embleem Definitie (Wereldbol & Fakkel) -->
-  <svg class="hidden" aria-hidden="true">
-    <defs>
-      <g id="torch-globe-icon" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="46" fill="#B7D1EC" stroke="#0B2257" stroke-width="5"/>
-        <path d="M22 34 C34 26, 48 30, 44 44 C40 54, 24 58, 18 48 Z" fill="#0B2257"/>
-        <path d="M58 24 C70 22, 82 32, 78 46 C74 58, 62 54, 58 42 Z" fill="#0B2257"/>
-        <path d="M34 64 C46 58, 62 64, 58 78 C54 88, 36 86, 32 74 Z" fill="#0B2257"/>
-        <path d="M14 66 C24 62, 34 66, 42 70 L38 75 C28 71, 20 71, 14 73 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
-        <path d="M46 46 L56 42 L68 78 L58 82 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
-        <path d="M44 44 C38 34, 46 20, 58 14 C56 22, 62 24, 66 16 C70 24, 66 36, 58 43 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
-        <path d="M62 62 C72 58, 82 62, 88 68 L84 73 C78 68, 70 66, 62 68 Z" fill="#FFFFFF" stroke="#0B2257" stroke-width="2.5" stroke-linejoin="round"/>
-      </g>
-    </defs>
-  </svg>
-
   <!-- Header -->
   <header class="pt-5 pb-3 px-5 flex items-center justify-between border-b border-[#B7D1EC]/20 bg-[#071538]/95 backdrop-blur-md sticky top-0 z-30">
     <div class="flex items-center gap-3">
-      <svg class="w-10 h-10 shrink-0 drop-shadow" viewBox="0 0 100 100">
-        <use href="#torch-globe-icon"></use>
-      </svg>
+      <img
+        src="https://raw.githubusercontent.com/TheStripedZebra/HitsterApgen/main/apgenlogo.jpg"
+        alt="APGEN Logo"
+        class="w-10 h-10 rounded-full object-cover border-2 border-[#B7D1EC] shrink-0 shadow"
+      />
       <div>
         <h1 class="font-black text-lg tracking-tight text-[#D6E6F5]">
-          HITSTER SCANNER
+          APGEN HITSTER
         </h1>
-        <p class="text-[11px] text-[#8FB4D9] -mt-0.5 font-medium">GitHub & Blind Audio Edition</p>
+        <p class="text-[11px] text-[#8FB4D9] -mt-0.5 font-medium">Kring Edition</p>
       </div>
     </div>
-
-    <span id="privacyBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#B7D1EC]/15 text-[#B7D1EC] border border-[#B7D1EC]/30 flex items-center gap-1.5">
-      <span class="w-1.5 h-1.5 rounded-full bg-[#B7D1EC] animate-pulse"></span>
-      Spoiler-vrij
-    </span>
   </header>
 
   <!-- Main Content -->
@@ -129,7 +110,7 @@
     <section id="tab-scanner" class="space-y-5">
       <div class="text-center space-y-1">
         <h2 class="text-xl font-extrabold text-[#D6E6F5]">Scan een muziekkaart</h2>
-        <p class="text-sm text-[#8FB4D9]">Richt je camera op de QR-code. De titel blijft geheim.</p>
+        <p class="text-sm text-[#8FB4D9]">Richt je camera op de QR-code.</p>
       </div>
 
       <!-- Camera Viewport -->
@@ -169,18 +150,17 @@
       </div>
 
       <!-- Mystery Card / Emblem View -->
-      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-[#0E2966] to-[#091B45] border-2 border-[#B7D1EC]/30 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px] transition-all duration-500">
-
-        <!-- UNREVEALED STATE -->
-        <div id="unrevealedView" class="flex flex-col items-center text-center space-y-5 w-full">
-          <!-- Draaiend Wereldbol & Fakkel Medaillon -->
+      <div id="mysteryCard" class="relative rounded-3xl bg-gradient-to-b from-[#0E2966] to-[#091B45] border-2 border-[#B7D1EC]/30 p-6 shadow-2xl flex flex-col items-center justify-center min-h-[310px]">
+        <div class="flex flex-col items-center text-center space-y-5 w-full">
+          <!-- Draaiende apgenlogo.jpg -->
           <div class="relative w-44 h-44 flex items-center justify-center">
             <div class="absolute inset-0 rounded-full border-2 border-dashed border-[#B7D1EC]/35"></div>
-            <div id="vinylDisc" class="w-36 h-36 rounded-full bg-[#071538] border-4 border-[#B7D1EC] shadow-lg flex items-center justify-center emblem-spin emblem-paused p-1">
-              <svg class="w-full h-full" viewBox="0 0 100 100">
-                <use href="#torch-globe-icon"></use>
-              </svg>
-            </div>
+            <img
+              id="vinylDisc"
+              src="https://raw.githubusercontent.com/TheStripedZebra/HitsterApgen/main/apgenlogo.jpg"
+              alt="APGEN Track"
+              class="w-36 h-36 rounded-full object-cover border-4 border-[#B7D1EC] shadow-lg emblem-spin emblem-paused"
+            />
           </div>
 
           <!-- Equalizer Bars -->
@@ -193,36 +173,8 @@
           </div>
 
           <div>
-            <h3 class="text-xl font-black text-[#D6E6F5] tracking-tight">??? MYSTERY TRACK ???</h3>
-            <p class="text-xs text-[#8FB4D9] mt-1">Bestandsnaam en titel zijn verborgen</p>
+            <h3 class="text-xl font-black text-[#D6E6F5] tracking-wide">APGEN TRACK</h3>
           </div>
-        </div>
-
-        <!-- REVEALED STATE -->
-        <div id="revealedView" class="hidden flex-col items-center text-center space-y-4 w-full py-2">
-          <span class="text-xs font-bold uppercase tracking-widest text-[#071538] bg-[#B7D1EC] px-3.5 py-1 rounded-full">
-            Ontmaskerd
-          </span>
-
-          <div id="revealYearBox" class="py-2 px-6 rounded-2xl bg-[#071538]/80 border border-[#B7D1EC]/40">
-            <span class="text-[11px] uppercase tracking-widest text-[#8FB4D9] block">Jaartal</span>
-            <span id="revealYear" class="text-5xl font-black text-[#D6E6F5]">
-              ????
-            </span>
-          </div>
-
-          <div class="space-y-1 max-w-full px-2">
-            <h3 id="revealTitle" class="text-2xl font-black text-[#D6E6F5] break-words leading-tight">
-              Onbekende Titel
-            </h3>
-            <p id="revealArtist" class="text-base font-semibold text-[#B7D1EC] break-words">
-              Onbekende Artiest
-            </p>
-          </div>
-
-          <p id="revealRawFilename" class="text-[11px] text-[#8FB4D9] font-mono break-all pt-2 border-t border-[#B7D1EC]/20 w-full">
-            bestand.mp3
-          </p>
         </div>
       </div>
 
@@ -251,13 +203,9 @@
         </button>
       </div>
 
-      <!-- Action Buttons: Reveal & Next Scan -->
-      <div class="space-y-3 pt-2">
-        <button id="btnReveal" onclick="handleRevealClick()" class="w-full py-4 px-5 rounded-2xl font-black text-base bg-[#0B2257] border-2 border-[#B7D1EC] text-[#D6E6F5] hover:bg-[#B7D1EC]/15 active:scale-95 transition shadow-md">
-          Onthul Titel & Jaartal
-        </button>
-
-        <button onclick="nextCard()" class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm bg-[#0B2257]/70 border border-[#B7D1EC]/20 text-[#8FB4D9] hover:text-[#D6E6F5] active:scale-95 transition">
+      <!-- Volgende Kaart Scannen -->
+      <div class="pt-2">
+        <button onclick="nextCard()" class="w-full py-4 px-5 rounded-2xl font-black text-base bg-[#0B2257] border-2 border-[#B7D1EC] text-[#D6E6F5] hover:bg-[#B7D1EC]/15 active:scale-95 transition shadow-md">
           Volgende Kaart Scannen
         </button>
       </div>
@@ -322,16 +270,10 @@
   <audio id="secretAudioPlayer" preload="auto" playsinline></audio>
 
   <script>
+    const APGEN_LOGO_URL = "https://raw.githubusercontent.com/TheStripedZebra/HitsterApgen/main/apgenlogo.jpg";
+
     let html5QrCode = null;
     let isScanning = false;
-    let revealConfirmStep = false;
-    let currentTrackInfo = {
-      rawUrl: '',
-      filename: '',
-      title: 'Onbekend nummer',
-      artist: 'Onbekende artiest',
-      year: '????'
-    };
 
     const audioEl = document.getElementById('secretAudioPlayer');
 
@@ -359,58 +301,16 @@
       return cleanUrl;
     }
 
-    function parseTrackMetadata(url) {
-      try {
-        const urlObj = new URL(url);
-        const pathParts = urlObj.pathname.split('/');
-        let rawFilename = decodeURIComponent(pathParts[pathParts.length - 1] || 'Onbekend.mp3');
-
-        let nameWithoutExt = rawFilename.replace(/\.[^/.]+$/, '').replace(/_/g, ' ').trim();
-
-        let year = '????';
-        const yearMatch = nameWithoutExt.match(/\b(19\d{2}|20[0-2]\d)\b/);
-        if (yearMatch) {
-          year = yearMatch[1];
-          nameWithoutExt = nameWithoutExt
-            .replace(new RegExp(`\\(?\\b${year}\\b\\)?`), '')
-            .replace(/^\s*-\s*|\s*-\s*$/g, '')
-            .trim();
-        }
-
-        let artist = 'GitHub Audio Track';
-        let title = nameWithoutExt;
-
-        if (nameWithoutExt.includes(' - ')) {
-          const parts = nameWithoutExt.split(' - ');
-          artist = parts[0].trim();
-          title = parts.slice(1).join(' - ').trim();
-        }
-
-        return {
-          rawUrl: url,
-          filename: rawFilename,
-          title: title || rawFilename,
-          artist: artist,
-          year: year
-        };
-      } catch (e) {
-        return {
-          rawUrl: url,
-          filename: url,
-          title: 'Mystery Audio Track',
-          artist: 'Externe Bron',
-          year: '????'
-        };
-      }
-    }
-
     function applySpoilerFreeLockscreen() {
-      document.title = 'Hitster Mystery Track';
+      document.title = 'APGEN HITSTER';
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: '??? Mystery Track ???',
-          artist: 'Raad het jaartal!',
-          album: 'Hitster Blind Player'
+          title: 'APGEN TRACK',
+          artist: 'APGEN HITSTER',
+          album: 'Kring Edition',
+          artwork: [
+            { src: APGEN_LOGO_URL, sizes: '512x512', type: 'image/jpeg' }
+          ]
         });
       }
     }
@@ -466,28 +366,18 @@
         try {
           const data = JSON.parse(targetUrl);
           targetUrl = normalizeGitHubUrl(data.url || data.audio || '');
-          currentTrackInfo = {
-            rawUrl: targetUrl,
-            filename: data.title || 'Custom QR',
-            title: data.title || 'Onbekende titel',
-            artist: data.artist || 'Onbekende artiest',
-            year: data.year || '????'
-          };
         } catch (e) {
           targetUrl = normalizeGitHubUrl(targetUrl);
-          currentTrackInfo = parseTrackMetadata(targetUrl);
         }
       } else {
         targetUrl = normalizeGitHubUrl(targetUrl);
-        currentTrackInfo = parseTrackMetadata(targetUrl);
       }
 
-      resetRevealUI();
       document.getElementById('audioErrorBox').classList.add('hidden');
 
       switchTab('player');
 
-      audioEl.src = currentTrackInfo.rawUrl;
+      audioEl.src = targetUrl;
       audioEl.load();
 
       applySpoilerFreeLockscreen();
@@ -561,49 +451,10 @@
       audioEl.currentTime = Math.max(0, Math.min(audioEl.duration, audioEl.currentTime + seconds));
     }
 
-    function handleRevealClick() {
-      const btn = document.getElementById('btnReveal');
-
-      if (!revealConfirmStep) {
-        revealConfirmStep = true;
-        btn.textContent = 'Zeker weten? Tik nogmaals om te onthullen';
-        btn.classList.remove('border-[#B7D1EC]', 'text-[#D6E6F5]');
-        btn.classList.add('border-amber-300', 'text-amber-200', 'bg-amber-950/50');
-        return;
-      }
-
-      document.getElementById('unrevealedView').classList.add('hidden');
-      const revealedView = document.getElementById('revealedView');
-      revealedView.classList.remove('hidden');
-      revealedView.classList.add('flex');
-
-      document.getElementById('revealYear').textContent = currentTrackInfo.year;
-      document.getElementById('revealTitle').textContent = currentTrackInfo.title;
-      document.getElementById('revealArtist').textContent = currentTrackInfo.artist;
-      document.getElementById('revealRawFilename').textContent = currentTrackInfo.filename;
-
-      btn.classList.add('hidden');
-      document.getElementById('playerStatusText').textContent = 'Kaart onthuld';
-    }
-
-    function resetRevealUI() {
-      revealConfirmStep = false;
-      document.getElementById('unrevealedView').classList.remove('hidden');
-      const revealedView = document.getElementById('revealedView');
-      revealedView.classList.add('hidden');
-      revealedView.classList.remove('flex');
-
-      const btn = document.getElementById('btnReveal');
-      btn.classList.remove('hidden', 'border-amber-300', 'text-amber-200', 'bg-amber-950/50');
-      btn.classList.add('border-[#B7D1EC]', 'text-[#D6E6F5]');
-      btn.textContent = 'Onthul Titel & Jaartal';
-    }
-
     function nextCard() {
       audioEl.pause();
       audioEl.removeAttribute('src');
       updatePlayingState(false);
-      resetRevealUI();
       switchTab('scanner');
       startScanner();
     }
@@ -625,8 +476,7 @@
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      const meta = parseTrackMetadata(rawUrl);
-      document.getElementById('qrLabelText').textContent = `${meta.artist} - ${meta.title} (${meta.year})`;
+      document.getElementById('qrLabelText').textContent = 'APGEN TRACK';
       const outputBox = document.getElementById('qrOutputContainer');
       outputBox.classList.remove('hidden');
       outputBox.classList.add('flex');
